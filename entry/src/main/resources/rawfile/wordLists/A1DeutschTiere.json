@@ -1,0 +1,131 @@
+{
+  "version": "1",
+  "header": {
+    "title": "A1 Deutsch Wortliste - Tiere",
+    "language": "de",
+    "targetLanguage": "en",
+    "level": "A1"
+  },
+  "data": [
+    {
+      "article": "der",
+      "word": "Hund",
+      "meaning": "Dog",
+      "example": "Der Hund bellt."
+    },
+    {
+      "article": "die",
+      "word": "Katze",
+      "meaning": "Cat",
+      "example": "Die Katze schläft."
+    },
+    {
+      "article": "der",
+      "word": "Fisch",
+      "meaning": "Fish",
+      "example": "Der Fisch schwimmt."
+    },
+    {
+      "article": "der",
+      "word": "Vogel",
+      "meaning": "Bird",
+      "example": "Der Vogel singt."
+    },
+    {
+      "article": "das",
+      "word": "Pferd",
+      "meaning": "Horse",
+      "example": "Das Pferd ist schnell."
+    },
+    {
+      "article": "die",
+      "word": "Maus",
+      "meaning": "Mouse",
+      "example": "Die Maus ist klein."
+    },
+    {
+      "article": "die",
+      "word": "Kuh",
+      "meaning": "Cow",
+      "example": "Die Kuh gibt Milch."
+    },
+    {
+      "article": "das",
+      "word": "Schwein",
+      "meaning": "Pig",
+      "example": "Das Schwein ist rosa."
+    },
+    {
+      "article": "die",
+      "word": "Ziege",
+      "meaning": "Goat",
+      "example": "Die Ziege frisst Gras."
+    },
+    {
+      "article": "das",
+      "word": "Lamm",
+      "meaning": "Lamb",
+      "example": "Das Lamm ist jung."
+    },
+    {
+      "article": "das",
+      "word": "Huhn",
+      "meaning": "Chicken",
+      "example": "Das Huhn legt Eier."
+    },
+    {
+      "article": "der",
+      "word": "Hahn",
+      "meaning": "Rooster",
+      "example": "Der Hahn kräht am Morgen."
+    },
+    {
+      "article": "die",
+      "word": "Ente",
+      "meaning": "Duck",
+      "example": "Die Ente schwimmt im Teich."
+    },
+    {
+      "article": "der",
+      "word": "Bär",
+      "meaning": "Bear",
+      "example": "Der Bär schläft im Winter."
+    },
+    {
+      "article": "der",
+      "word": "Löwe",
+      "meaning": "Lion",
+      "example": "Der Löwe ist stark."
+    },
+    {
+      "article": "der",
+      "word": "Affe",
+      "meaning": "Monkey",
+      "example": "Der Affe isst Bananen."
+    },
+    {
+      "article": "der",
+      "word": "Elefant",
+      "meaning": "Elephant",
+      "example": "Der Elefant ist sehr groß."
+    },
+    {
+      "article": "die",
+      "word": "Schlange",
+      "meaning": "Snake",
+      "example": "Die Schlange ist lang."
+    },
+    {
+      "article": "die",
+      "word": "Spinne",
+      "meaning": "Spider",
+      "example": "Die Spinne webt ein Netz."
+    },
+    {
+      "article": "das",
+      "word": "Kaninchen",
+      "meaning": "Rabbit",
+      "example": "Das Kaninchen hoppelt schnell."
+    }
+  ]
+}

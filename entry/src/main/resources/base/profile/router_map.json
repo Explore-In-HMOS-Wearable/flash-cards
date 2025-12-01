@@ -1,0 +1,12 @@
+{
+  "routerMap": [
+    {
+      "name": "FlashCardsPage",
+      "pageSourceFile": "src/main/ets/pages/FlashCardsPage.ets",
+      "buildFunction": "FlashCardsPageBuilder",
+      "data": {
+        "description": "FlashCardsPage"
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "version": "1",
+  "header": {
+    "title": "A1 Deutsch Wortliste",
+    "language": "de",
+    "targetLanguage": "en",
+    "level": "A1"
+  },
+  "data": [
+    {
+      "article": "das",
+      "word": "Buch",
+      "meaning": "Book",
+      "example": "Ich lese ein Buch."
+    },
+    {
+      "article": "das",
+      "word": "Haus",
+      "meaning": "House",
+      "example": "Das Haus ist groß."
+    },
+    {
+      "article": "der",
+      "word": "Tisch",
+      "meaning": "Table",
+      "example": "Der Tisch steht im Wohnzimmer."
+    },
+    {
+      "article": "die",
+      "word": "Blume",
+      "meaning": "Flower",
+      "example": "Die Blume duftet gut."
+    },
+    {
+      "article": "der",
+      "word": "Stuhl",
+      "meaning": "Chair",
+      "example": "Der Stuhl ist bequem."
+    },
+    {
+      "article": "das",
+      "word": "Auto",
+      "meaning": "Car",
+      "example": "Das Auto fährt schnell."
+    },
+    {
+      "article": "die",
+      "word": "Straße",
+      "meaning": "Street",
+      "example": "Die Straße ist lang."
+    }
+  ]
+
+}

@@ -1,0 +1,131 @@
+{
+  "version": "1",
+  "header": {
+    "title": "A1 Deutsch Wortliste - Verben",
+    "language": "de",
+    "targetLanguage": "en",
+    "level": "A1"
+  },
+  "data": [
+    {
+      "article": "",
+      "word": "machen",
+      "meaning": "to make, to do",
+      "example": "Ich mache meine Hausaufgaben."
+    },
+    {
+      "article": "",
+      "word": "haben",
+      "meaning": "to have",
+      "example": "Hast du Zeit?"
+    },
+    {
+      "article": "",
+      "word": "sein",
+      "meaning": "to be",
+      "example": "Er ist Lehrer."
+    },
+    {
+      "article": "",
+      "word": "gehen",
+      "meaning": "to go",
+      "example": "Wir gehen ins Kino."
+    },
+    {
+      "article": "",
+      "word": "kommen",
+      "meaning": "to come",
+      "example": "Kommst du morgen?"
+    },
+    {
+      "article": "",
+      "word": "sprechen",
+      "meaning": "to speak",
+      "example": "Sie spricht Deutsch."
+    },
+    {
+      "article": "",
+      "word": "essen",
+      "meaning": "to eat",
+      "example": "Was isst du gern?"
+    },
+    {
+      "article": "",
+      "word": "trinken",
+      "meaning": "to drink",
+      "example": "Ich trinke Wasser."
+    },
+    {
+      "article": "",
+      "word": "wohnen",
+      "meaning": "to live",
+      "example": "Wo wohnst du?"
+    },
+    {
+      "article": "",
+      "word": "heißen",
+      "meaning": "to be called",
+      "example": "Ich heiße Anna."
+    },
+    {
+      "article": "",
+      "word": "lernen",
+      "meaning": "to learn, to study",
+      "example": "Lernst du viel?"
+    },
+    {
+      "article": "",
+      "word": "spielen",
+      "meaning": "to play",
+      "example": "Sie spielen Fußball."
+    },
+    {
+      "article": "",
+      "word": "kaufen",
+      "meaning": "to buy",
+      "example": "Ich kaufe Brot."
+    },
+    {
+      "article": "",
+      "word": "fragen",
+      "meaning": "to ask",
+      "example": "Er fragt den Lehrer."
+    },
+    {
+      "article": "",
+      "word": "antworten",
+      "meaning": "to answer",
+      "example": "Sie antwortet schnell."
+    },
+    {
+      "article": "",
+      "word": "lesen",
+      "meaning": "to read",
+      "example": "Liest du ein Buch?"
+    },
+    {
+      "article": "",
+      "word": "schreiben",
+      "meaning": "to write",
+      "example": "Wir schreiben eine E-Mail."
+    },
+    {
+      "article": "",
+      "word": "sehen",
+      "meaning": "to see",
+      "example": "Ich sehe den Film."
+    },
+    {
+      "article": "",
+      "word": "hören",
+      "meaning": "to hear, to listen",
+      "example": "Hörst du Musik?"
+    },
+    {
+      "article": "",
+      "word": "brauchen",
+      "meaning": "to need",
+      "example": "Ich brauche Hilfe."
+    }
+  ]
+}
