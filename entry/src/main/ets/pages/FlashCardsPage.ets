@@ -6,7 +6,7 @@ import { LengthMetrics, LengthMetricsUnit, LengthUnit } from '@kit.ArkUI';
 import { CustomText } from '../components/atoms/CustomText';
 
 @Builder
-function FlashCardsPageBuilder() {
+function flashCardsPageBuilder() {
   FlashCardsPage()
 }
 
@@ -101,7 +101,7 @@ struct FlashCardsPage {
 
       const ids: number[] | undefined = this.pathStack.getIndexByName('FlashCardsPage');
       if (ids !== undefined) {
-        console.info('ids: ' + ids)
+        console.info(`ids: ${ids}`)
       }
       if (Array.isArray(ids) && ids.length > 0) {
         const idx = ids[ids.length - 1];
@@ -129,7 +129,7 @@ struct FlashCardsPage {
 
         this.dataLoaded = true;
         this.wordDataList.forEach(element => {
-          console.info('element: ' + element.toString())
+          console.info(`element: ${element.toString()}`)
         });
 
         this.remainingCount = await this.databaseManager.getWordCounts()

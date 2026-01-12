@@ -2,7 +2,7 @@ import { relationalStore } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { JSON, util } from '@kit.ArkTS';
 import WordData from '../models/WordData';
-
+import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 
 const DB_NAME: string = 'WordLists.db';
 const DB_VERSION: number = 1;
@@ -10,7 +10,7 @@ const DB_VERSION: number = 1;
 const STORE_CONFIG: relationalStore.StoreConfig = {
   name: DB_NAME,
   securityLevel: relationalStore.SecurityLevel.S3,
-  encrypt: false,
+  encrypt: false
 };
 
 export interface Remaining {
@@ -39,6 +39,35 @@ export interface DatabaseManagerParam {
   databaseManager: DatabaseManager
 }
 
+async function doRand(): Promise<number> {
+  let rand = cryptoFramework.createRandom();
+  let seed = new Uint8Array([1, 2, 3]);
+  rand.setSeed({ data: seed });
+
+  const len = 12;
+  const randBlob = await rand.generateRandom(len);
+
+  const bytes = randBlob.data;
+
+  // Convert bytes (Uint8Array) → BigInt
+  let value = 0n;
+  for (let i = 0; i < bytes.length; i++) {
+    value = (value << 8n) + BigInt(bytes[i]);
+  }
+
+  // max for N bytes = 2^(8N) - 1
+  const max = (1n << BigInt(len * 8)) - 1n;
+
+  // Normalize 0–1 by dividing BigInts, then converting to Number
+  const normalized = Number(value) / Number(max);
+
+  return normalized;
+}
+
+
+
+
+
 export class DatabaseManager {
   private rdbStore?: relationalStore.RdbStore;
   private tableName: string = ''
@@ -55,7 +84,6 @@ export class DatabaseManager {
         resolve();
         return;
       }
-
       relationalStore.getRdbStore(context, STORE_CONFIG,
         async (err: BusinessError | undefined, store: relationalStore.RdbStore) => {
           if (err) {
@@ -69,12 +97,11 @@ export class DatabaseManager {
 
           try {
             const queryResult =
-              await store.querySql(`SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`);
+              await store.querySql(`SELECT name FROM sqlite_master WHERE type='table' AND name=?;`, [tableName]);
             const tableExists = queryResult.rowCount > 0;
             queryResult.close();
 
             if (!tableExists) {
-              console.info(`Table '${tableName}' not found. Creating and importing...`);
               await store.execute(getSQLCreateTableString(tableName));
               await this.importFromJson(context, tableName)
 
@@ -82,7 +109,7 @@ export class DatabaseManager {
                 store.version = DB_VERSION;
               }
             } else {
-              console.info(`Table '${tableName}' already exists. Skipping creation/import.`);
+              console.info(`Table ${tableName} already exists. Skipping creation/import.`);
             }
           } catch (e) {
             const error = e as BusinessError;
@@ -105,12 +132,12 @@ export class DatabaseManager {
       article: entry.article,
       word: entry.word,
       meaning: entry.meaning,
-      example: entry.example,
+      example: entry.example
     };
 
     try {
       const rowId: number = await this.rdbStore.insert(this.tableName, values);
-      console.info(`Inserted word "${entry.word}" (rowId=${rowId})`);
+      console.info(`Inserted word ${entry.word} (rowId=${rowId})`);
     } catch (error) {
       const err = error as BusinessError;
       console.error(`Failed to insert word. Code:${err.code}, message:${err.message}`);
@@ -129,7 +156,6 @@ export class DatabaseManager {
       const decoder = util.TextDecoder.create('utf-8');
       let text = decoder.decodeToString(fileData)
 
-      console.info('jsonText: ' + text)
       const wl = JSON.parse(text) as WordListJson;
 
       if (!wl.data || !Array.isArray(wl.data)) {
@@ -220,113 +246,72 @@ export class DatabaseManager {
     const rdbStore = this.rdbStore;
     const tableName = this.tableName;
 
-    // Convert excludedIds to a comma-separated string for the SQL 'NOT IN' clause
-    const excludedIdsString = excludedIds.join(', ');
+    const countPredicates = new relationalStore.RdbPredicates(tableName);
+    countPredicates.equalTo('learned', 0);
+    if (excludedIds.length > 0) {
+      countPredicates.notIn('id', excludedIds);
+    }
 
-    return new Promise<WordData[] | null>((resolve, reject) => {
+    const countResult = await rdbStore.query(countPredicates, ['COUNT(*)']);
+    countResult.goToFirstRow();
+    const totalUnlearned = countResult.getLong(0);
+    countResult.close();
 
-      // Step 1: Count the number of unlearned words, excluding the given IDs
-      const countPredicates = new relationalStore.RdbPredicates(tableName);
-      countPredicates.equalTo('learned', 0);
+    if (totalUnlearned === 0) {
+      return null;
+    }
 
-      // Add NOT IN clause if excludedIds is not empty
+    const N = Math.min(requiredCount, totalUnlearned);
+    if (N === 0) {
+      return [];
+    }
+    const offsets = new Set<number>();
+    while (offsets.size < N) {
+      const r = await doRand();  // NOW WORKS
+      offsets.add(Math.floor(r * totalUnlearned));
+    }
+
+    const offsetArray = Array.from(offsets);
+    const results: WordData[] = [];
+
+    for (const offset of offsetArray) {
+      const wordPred = new relationalStore.RdbPredicates(tableName);
+      wordPred.equalTo('learned', 0);
       if (excludedIds.length > 0) {
-        countPredicates.notIn('id', excludedIds);
+        wordPred.notIn('id', excludedIds);
+      }
+      wordPred.limitAs(1);
+      wordPred.offsetAs(offset);
+
+      const rs = await rdbStore.query(wordPred, [
+        'id',
+        'article',
+        'word',
+        'meaning',
+        'example',
+        'learned'
+      ]);
+
+      if (rs.goToFirstRow()) {
+        results.push(new WordData(
+          rs.getLong(rs.getColumnIndex('id')),
+          rs.getString(rs.getColumnIndex('article')),
+          rs.getString(rs.getColumnIndex('word')),
+          rs.getString(rs.getColumnIndex('meaning')),
+          rs.getString(rs.getColumnIndex('example')),
+          rs.getLong(rs.getColumnIndex('learned')) === 1
+        ));
       }
 
-      rdbStore.query(
-        countPredicates,
-        ['COUNT(*)'],
-        (err: BusinessError | undefined, countResultSet: relationalStore.ResultSet) => {
-          if (err) {
-            console.error(`Query (Count) failed. Code:${err.code}, message:${err.message}`);
-            reject(err);
-            return;
-          }
-
-          let totalUnlearnedCount = 0;
-          if (countResultSet.goToFirstRow()) {
-            // countResultSet.getLong(0) is the COUNT(*) value
-            totalUnlearnedCount = countResultSet.getLong(0);
-          }
-          countResultSet.close();
-
-          if (totalUnlearnedCount === 0) {
-            console.warn('No unlearned words found after exclusion.');
-            resolve(null);
-            return;
-          }
-
-          const N = Math.min(requiredCount, totalUnlearnedCount);
-          if (N === 0) {
-            resolve([]);
-            return;
-          }
-
-          // Step 2: Generate N Unique Random Offsets based on the total remaining count
-          const offsets = new Set<number>();
-          while (offsets.size < N) {
-            offsets.add(Math.floor(Math.random() * totalUnlearnedCount));
-          }
-          const offsetArray = Array.from(offsets);
-
-          // Step 3: Fetch all N words concurrently (using a manual promise collector)
-          const results: WordData[] = [];
-          let completedQueries = 0;
-          const totalQueries = N;
-
-          for (const offset of offsetArray) {
-            const wordPredicates = new relationalStore.RdbPredicates(tableName);
-            wordPredicates.equalTo('learned', 0);
-
-            // Add NOT IN clause to the fetching query as well
-            if (excludedIds.length > 0) {
-              wordPredicates.notIn('id', excludedIds);
-            }
-
-            wordPredicates.limitAs(1);
-            wordPredicates.offsetAs(offset);
-
-            rdbStore.query(
-              wordPredicates,
-              ['id', 'article', 'word', 'meaning', 'example', 'learned'],
-              (err2: BusinessError | undefined, wordResultSet: relationalStore.ResultSet) => {
-                if (err2) {
-                  console.error(`Query (Word) failed. Code:${err2.code}, message:${err2.message}`);
-                  reject(err2);
-                  return;
-                }
-
-                if (wordResultSet.goToFirstRow()) {
-                  results.push(new WordData(
-                    wordResultSet.getLong(wordResultSet.getColumnIndex('id')),
-                    wordResultSet.getString(wordResultSet.getColumnIndex('article')),
-                    wordResultSet.getString(wordResultSet.getColumnIndex('word')),
-                    wordResultSet.getString(wordResultSet.getColumnIndex('meaning')),
-                    wordResultSet.getString(wordResultSet.getColumnIndex('example')),
-                    wordResultSet.getLong(wordResultSet.getColumnIndex('learned')) === 1
-                  ));
-                }
-                wordResultSet.close();
-
-                completedQueries++;
-                if (completedQueries === totalQueries) {
-                  resolve(results);
-                }
-              }
-            );
-          }
-        }
-      );
-    });
+      rs.close();
+    }
+    return results;
   }
-
 
   async getWordCounts(): Promise<Remaining> {
     if (!this.rdbStore) {
       throw new Error('Database not initialized.');
     }
-
     const rdbStore = this.rdbStore;
     const tableName = this.tableName;
 
@@ -335,17 +320,14 @@ export class DatabaseManager {
       let unlearnedCount: number = 0;
       let queriesCompleted: number = 0;
       const totalQueries: number = 2;
-
       const finishCheck = () => {
         queriesCompleted++;
         if (queriesCompleted === totalQueries) {
           resolve({ learnedCount, unlearnedCount });
         }
       };
-
       const learnedPredicates = new relationalStore.RdbPredicates(tableName);
       learnedPredicates.equalTo('learned', 1);
-
       rdbStore.query(
         learnedPredicates,
         ['COUNT(*)'],
@@ -355,7 +337,6 @@ export class DatabaseManager {
             reject(err);
             return;
           }
-
           if (resultSet.goToFirstRow()) {
             learnedCount = resultSet.getLong(0);
           }
@@ -363,10 +344,8 @@ export class DatabaseManager {
           finishCheck();
         }
       );
-
       const unlearnedPredicates = new relationalStore.RdbPredicates(tableName);
       unlearnedPredicates.equalTo('learned', 0);
-
       rdbStore.query(
         unlearnedPredicates,
         ['COUNT(*)'],
@@ -376,7 +355,6 @@ export class DatabaseManager {
             reject(err);
             return;
           }
-
           if (resultSet.goToFirstRow()) {
             unlearnedCount = resultSet.getLong(0);
           }
@@ -391,20 +369,16 @@ export class DatabaseManager {
     if (!this.rdbStore) {
       throw new Error('Database not initialized.');
     }
-
     const values: relationalStore.ValuesBucket = {
-      learned: 0,
+      learned: 0
     };
-
     const predicates: relationalStore.RdbPredicates = new relationalStore.RdbPredicates(this.tableName);
-
     try {
       const rowsAffected: number = await this.rdbStore.update(values, predicates);
-      console.info(`Reset learned status for table '${this.tableName}'. Rows affected: ${rowsAffected}`);
+      console.info(`Reset learned status for table ${this.tableName}. Rows affected: ${rowsAffected}`);
     } catch (error) {
       const err = error as BusinessError;
       console.error(`Failed to reset learned status. Code:${err.code}, message:${err.message}`);
     }
   }
-
 }

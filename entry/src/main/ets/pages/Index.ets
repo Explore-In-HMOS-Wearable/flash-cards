@@ -9,7 +9,7 @@ struct Index {
   wordLists: WordList[] = [
     new WordList('A1 Deutsch', 'A1DeutschWortliste'),
     new WordList('A1 Deutsch Animals', 'A1DeutschTiere'),
-    new WordList('A1 Deutsch Verbs', 'A1DeutschVerben'),
+    new WordList('A1 Deutsch Verbs', 'A1DeutschVerben')
   ]
   @State selectedIndex: number = -1;
   @State remaining: Remaining = { learnedCount: 0, unlearnedCount: 0 };
@@ -52,7 +52,6 @@ struct Index {
           .onClick(async () => {
             let databaseManager: DatabaseManager = new DatabaseManager()
             try {
-              console.info('Filename: ' + this.wordLists[this.selectedIndex].fileName)
               await databaseManager.createStore(this.ctx, this.wordLists[this.selectedIndex].fileName)
               let param: DatabaseManagerParam = { databaseManager: databaseManager }
               this.pathStack.pushPathByName('FlashCardsPage', param)

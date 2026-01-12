@@ -32,7 +32,7 @@ export struct FlashCard {
       curve: Curve.EaseIn,
       onFinish: () => {
         func()
-      },
+      }
     }, () => {
       this.cardRotation = rotation
     });
@@ -78,13 +78,13 @@ export struct FlashCard {
         this.uiCtx?.animateTo(
           {
             duration: 250,
-            curve: Curve.EaseOut,
+            curve: Curve.EaseOut
           },
           () => {
             this.rotation = 0;
           }
         );
-      },
+      }
     }, () => {
       this.rotation = 90;
     });
@@ -141,7 +141,7 @@ export struct FlashCard {
     }
     .rotate({ angle: this.cardRotation, centerY: 1000 })
     .onTouch((event: TouchEvent) => {
-      if (!event || !this.isActive || this.rotationCount == 0) {
+      if (!event || !this.isActive || this.rotationCount === 0) {
         return;
       }
       const rotationThreshold: number = 5
