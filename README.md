@@ -1,24 +1,21 @@
-> **Note:** To access all shared projects, get information about environment setup, and view other guides, please visit [Explore-In-HMOS-Wearable Index](https://github.com/Explore-In-HMOS-Wearable/hmos-index).
-
 # Flash Cards
 
 **Flash Cards** is a HarmonyOS wearable sample application that help to learn foreign words. 
 # Preview
 
 <p align="left">
-    <img src="screenshots/ss1.gif" width="24%" />
-    <img src="screenshots/ss2.png" width="24%" />
-    <img src="screenshots/ss3.png" width="24%" />
-    <img src="screenshots/ss4.png" width="24%" />
+    <img src="screenshots/1.png" width="24%" />
+    <img src="screenshots/2.png" width="24%" />
+    <img src="screenshots/3.png" width="24%" />
+    <img src="screenshots/4.png" width="24%" />
 </p>
-
 
 # Use Cases
 
 * Learning and reviewing vocabulary on a daily basis
 * Selecting and switching between different word lists
 
-# Technology Stack
+# Tech Stack
 **Languages**: ArkTS, ArkUI  
 **Frameworks**: HarmonyOS SDK 6.0.0  
 **Tools**: DevEco Studio 6.0.0  
@@ -63,7 +60,6 @@
                 A1DeutschVerben.json
                 A1DeutschWortliste.json
 ```
-
 
 # Constraints and Restrictions
 

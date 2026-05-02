@@ -1,8 +1,6 @@
 import { DatabaseManager, DatabaseManagerParam, Remaining } from '../common/DatabaseManager';
 import { Cards } from '../components/templates/Cards';
 import WordData from '../models/WordData';
-import { ArcButton, ArcButtonOptions, ArcButtonPosition, ArcButtonStyleMode } from '@ohos.arkui.advanced.ArcButton';
-import { LengthMetrics, LengthMetricsUnit, LengthUnit } from '@kit.ArkUI';
 import { CustomText } from '../components/atoms/CustomText';
 
 @Builder
@@ -15,8 +13,11 @@ function flashCardsPageBuilder() {
 struct FlashCardsPage {
   pathStack: NavPathStack = new NavPathStack()
   @State wordDataList: WordData[] =
-    [new WordData(0, 'das', '', '', '', false), new WordData(0, 'das', '', '', '', false),
-      new WordData(0, 'das', '', '', '', false),]
+    [
+      new WordData(0, 'das', '', '', '', false),
+      new WordData(0, 'das', '', '', '', false),
+      new WordData(0, 'das', '', '', '', false)
+    ]
   @State databaseManager: DatabaseManager = new DatabaseManager;
   @State dataLoaded: boolean = false;
   @State initalVisibilities: boolean[] = [true, true, true];
@@ -24,72 +25,71 @@ struct FlashCardsPage {
 
   build() {
     NavDestination() {
-      Stack() {
+      Stack({ alignContent: Alignment.Top }) {
         Column() {
-          Text(this.remainingCount.learnedCount + ` cards learned`)
-            .fontColor(Color.Black)
+          Text(`${this.remainingCount.learnedCount} cards learned`)
+            .fontColor(Color.White)
             .fontSize(12)
-          Text(this.remainingCount.unlearnedCount + ` cards left`)
-            .fontColor(Color.Black)
+          Text(`${this.remainingCount.unlearnedCount} cards left`)
+            .fontColor(Color.White)
             .fontSize(12)
         }
         .width('100%')
         .height('100%')
-        .padding({ bottom: 22 })
+        .padding({ bottom: 10 })
         .justifyContent(FlexAlign.End)
 
         Column() {
-          ArcButton({
-            options: new ArcButtonOptions({
-              fontSize: { value: 12, unit: LengthUnit.PX },
-              label: 'Go back',
-              position: ArcButtonPosition.TOP_EDGE,
-              styleMode: ArcButtonStyleMode.EMPHASIZED_LIGHT,
-              onClick: (): void => {
-                console.info('Go back button pressed')
-                this.databaseManager.close()
-                this.pathStack.pop()
-              }
+          Button('Go back')
+            .fontSize(12)
+            .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+            .backgroundColor('#444466')
+            .onClick(() => {
+              console.info('Go back button pressed')
+              this.databaseManager.close()
+              this.pathStack.pop()
             })
-          })
-            .padding(0)
         }
-        .height('100%')
-        .width('100%')
 
         if (this.dataLoaded) {
           if (this.remainingCount.unlearnedCount !== 0) {
             Column() {
               Cards({
-                wordDataList: this.wordDataList,
-                databaseManager: this.databaseManager,
-                visibilities: this.initalVisibilities,
-                remainingCount: this.remainingCount
+                wordDataList: $wordDataList,
+                databaseManager: $databaseManager,
+                visibilities: $initalVisibilities,
+                remainingCount: $remainingCount
               })
-
+              .width('100%')
+              .height('100%')
             }
-            .height('55%')
-            .width('55%')
+            .height('52%')
+            .width('52%')
+            .margin({ top: '22%' })
           } else {
             Column() {
-              CustomText('Congratulations!\nYou have learned all the words!\n🎉🎉🎉', 16)
+              Column() {
+                  CustomText('Congratulations!\nYou have learned all the words!\n🎉🎉🎉', 16, Color.White)
+              }
               Button('Clear progress')
                 .onClick(async () => {
                   await this.databaseManager.setAllUnlearned()
                   this.databaseManager.close()
                   this.pathStack.pop()
                 })
+                .backgroundColor('#FF6B35')
                 .margin(5)
             }
             .height('55%')
-            .width('55%')
+            .width('70%')
+            .margin({ top: '22%' })
             .justifyContent(FlexAlign.Center)
 
           }
 
         } else {
           Text('Loading...')
-            .fontColor(Color.Black)
+            .fontColor(Color.White)
             .fontSize(24)
         }
       }
@@ -140,6 +140,11 @@ struct FlashCardsPage {
     .height('100%')
     .width('100%')
     .hideTitleBar(true)
-    .backgroundColor('#fffff2ea')
+    .backgroundColor('#1A1A2E')
+    .onBackPressed(() => {
+        this.databaseManager.close()
+        this.pathStack.pop()
+        return true;
+    })
   }
 }

@@ -1,4 +1,4 @@
-import { DatabaseManager, DatabaseManagerParam, Remaining } from '../common/DatabaseManager';
+import { DatabaseManager, DatabaseManagerParam } from '../common/DatabaseManager';
 import WordList from '../models/WordList';
 
 @Entry
@@ -9,10 +9,14 @@ struct Index {
   wordLists: WordList[] = [
     new WordList('A1 Deutsch', 'A1DeutschWortliste'),
     new WordList('A1 Deutsch Animals', 'A1DeutschTiere'),
-    new WordList('A1 Deutsch Verbs', 'A1DeutschVerben')
+    new WordList('A1 Deutsch Verbs', 'A1DeutschVerben'),
+    new WordList('A1 English', 'A1English'),
+    new WordList('A1 Spanish', 'A1Spanish'),
+    new WordList('A1 French', 'A1French'),
+    new WordList('A1 Turkish', 'A1Turkish'),
+    new WordList('My Custom List', 'MyCustomList')
   ]
   @State selectedIndex: number = -1;
-  @State remaining: Remaining = { learnedCount: 0, unlearnedCount: 0 };
 
   @Builder
   MyMenu() {
@@ -29,46 +33,116 @@ struct Index {
 
   build() {
     Navigation(this.pathStack) {
-      Column() {
-
-        Text('Flash Cards')
-          .fontColor(Color.Black)
-          .fontStyle(FontStyle.Italic)
-          .fontSize(28)
-          .padding(10)
-
+      Scroll() {
         Column() {
-          Text(this.selectedIndex === -1 ? 'Click to select word list' : this.wordLists[this.selectedIndex].name)
-            .fontSize(18)
-            .fontColor(Color.Black)
-            .fontWeight(FontWeight.Bold)
+
+          Text('Flash Cards')
+            .fontColor(Color.White)
+            .fontStyle(FontStyle.Italic)
+            .fontSize(28)
+            .padding(10)
+
+          Column() {
+            Text(this.selectedIndex === -1 ? 'Click to select word list' : this.wordLists[this.selectedIndex].name)
+              .fontSize(18)
+              .fontColor(Color.White)
+              .fontWeight(FontWeight.Bold)
+          }
+          .bindMenu(this.MyMenu)
+          .height(30)
+          .padding({left: 10, right: 10})
+          .backgroundColor('#2D2D44')
+          .borderRadius(15)
+          .margin({ bottom: 20 })
+          .justifyContent(FlexAlign.Center)
+
+          Button('Start Learning')
+            .onClick(async () => {
+              if (this.selectedIndex === -1) {
+                return;
+              }
+              let databaseManager: DatabaseManager = new DatabaseManager()
+              try {
+                await databaseManager.createStore(this.ctx, this.wordLists[this.selectedIndex].fileName)
+                let param: DatabaseManagerParam = { databaseManager: databaseManager }
+                this.pathStack.pushPathByName('FlashCardsPage', param)
+              } catch (e) {
+                databaseManager.close();
+                console.error(`Database error: ${e}`)
+              }
+            })
+            .width('70%')
+            .margin({ bottom: 10 })
+            .backgroundColor('#FF6B35')
+
+          Button('Quick Quiz')
+            .onClick(async () => {
+              if (this.selectedIndex === -1) {
+                  return;
+              }
+              let databaseManager: DatabaseManager = new DatabaseManager()
+              try {
+                await databaseManager.createStore(this.ctx, this.wordLists[this.selectedIndex].fileName)
+                let param: DatabaseManagerParam = { databaseManager: databaseManager }
+                this.pathStack.pushPathByName('QuizPage', param)
+              } catch (e) {
+                databaseManager.close();
+                console.error(`Database error: ${e}`)
+              }
+            })
+            .width('70%')
+            .backgroundColor('#00D4AA')
+            .margin({ bottom: 10 })
+
+          Button('Add New Word')
+            .onClick(async () => {
+                if (this.selectedIndex === -1) {
+                  this.selectedIndex = this.wordLists.length - 1;
+                }
+                let databaseManager: DatabaseManager = new DatabaseManager()
+                try {
+                  await databaseManager.createStore(this.ctx, this.wordLists[this.selectedIndex].fileName)
+                  let param: DatabaseManagerParam = { databaseManager: databaseManager }
+                  this.pathStack.pushPathByName('AddWordPage', param)
+                } catch (e) {
+                  databaseManager.close();
+                  console.error(`Database error: ${e}`)
+                }
+            })
+            .width('70%')
+            .backgroundColor('#444466')
+
+          Row() {
+              Button('Stats')
+                  .onClick(() => {
+                      this.pathStack.pushPathByName('StatisticsPage', null)
+                  })
+                  .margin(10)
+                  .backgroundColor('#00D4AA')
+
+              Button('Settings')
+                  .onClick(() => {
+                      this.pathStack.pushPathByName('SettingsPage', null)
+                  })
+                  .margin(10)
+                  .backgroundColor('#444466')
+          }
+          .margin({top: 20})
         }
-        .bindMenu(this.MyMenu)
-        .height(20)
-        .background('#11ff30ff')
-        .margin({ bottom: 10 })
-
-        Button('Start')
-          .onClick(async () => {
-            let databaseManager: DatabaseManager = new DatabaseManager()
-            try {
-              await databaseManager.createStore(this.ctx, this.wordLists[this.selectedIndex].fileName)
-              let param: DatabaseManagerParam = { databaseManager: databaseManager }
-              this.pathStack.pushPathByName('FlashCardsPage', param)
-            } catch (e) {
-              databaseManager.close();
-              console.error(`Database error: ${e}`)
-            }
-
-          })
+        .width('100%')
+        .padding({ top: 40, bottom: 40 })
       }
-      .height('100%')
-      .width('100%')
-      .justifyContent(FlexAlign.Center)
+      .scrollBar(BarState.Off)
     }
     .hideTitleBar(true)
     .hideBackButton(true)
-    .backgroundColor('#fffff2ea')
+    .backgroundColor('#1A1A2E')
     .mode(NavigationMode.Stack)
+    .parallelGesture(
+      PanGesture({ direction: PanDirection.Horizontal })
+        .onActionStart(() => {
+          console.info('Consuming horizontal swipe to prevent back navigation')
+        })
+    )
   }
 }
